@@ -53,15 +53,36 @@ class MyAppState extends ChangeNotifier {
 
 // ...
 
-class MyHomePage extends StatelessWidget {
+// 页面创建标记
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  var _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
+    Widget page;
+    switch (_selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = Placeholder();
+        break;
+      default:
+        throw UnimplementedError('no widget for $_selectedIndex');
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      return Row(
         children: [
           SafeArea(
             child: NavigationRail(
-              extended: false,
+              // 侧边栏大小
+              extended: constraints.maxWidth >= 600,
               destinations: [
                 NavigationRailDestination(
                   icon: Icon(Icons.home),
@@ -72,21 +93,26 @@ class MyHomePage extends StatelessWidget {
                   label: Text('Favorites'),
                 ),
               ],
-              selectedIndex: 0,
+              selectedIndex: _selectedIndex,
               onDestinationSelected: (value) {
-                print('selected: $value');
+                // 类似选择器
+                setState(() {
+                  _selectedIndex = value;
+                });
               },
             ),
           ),
+          // 一般expanded用于转换页面生成
           Expanded(
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
-              child: GeneratorPage(),
+              //
+              child: page,
             ),
           ),
         ],
-      ),
-    );
+      );
+    });
   }
 }
 
